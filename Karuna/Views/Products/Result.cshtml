@@ -1,0 +1,46 @@
+﻿@model Karuna.Models.ProductViewModels
+
+<table class="table table-bordered table-striped mb-none" id="datatable">
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Name</th>
+            <th>Price (RM)</th>
+            <th>Details</th>
+            <th>Publish</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.SearchResults)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Id)</td>
+                <td>@Html.DisplayFor(modelItem => item.Productname)</td>
+                <td>@Html.DisplayFor(modelItem => item.Price)</td>
+                <td>@Html.DisplayFor(modelItem => item.Details)</td>
+                <td>
+                    @if ((bool)item.Publish)
+                    {
+                        <strong>Yes</strong>
+                    }
+                    else
+                    {
+                        <strong>No</strong>
+                    }
+                </td>
+                <td>
+                    <button id="show" value="@item.Id" onclick="ShowProduct('@item.Id')" class="btn btn-primary" title="Show" style="background-color: deepskyblue; border: none">
+                        Show
+                    </button>
+                    <button id="edit" value="@item.Id" onclick="EditProduct('@item.Id')" class="btn btn-primary" title="Edit" style="background-color: royalblue; border: none ">
+                        Edit
+                    </button>
+                    <button id="delete" value="@item.Id" onclick="DeleteProduct('@item.Id')" class="btn btn-primary" title="Delete" style="background-color: indianred; border: none ">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

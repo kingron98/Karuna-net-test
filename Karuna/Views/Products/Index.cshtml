@@ -1,0 +1,326 @@
+﻿@using PagedList.Mvc;
+@using PagedList;
+@model Karuna.Models.ProductViewModels
+
+@{
+    ViewBag.Title = "Product List";
+}
+
+<section class="panel">
+    <header class="panel-heading">
+        <div class="panel-actions">
+            <button id="addProduct" onClick="OpenCreateForm()" class="btn btn-info" style="background-color:limegreen;border:none">
+                Create New Product
+            </button>
+        </div>
+
+        <h1 class="panel-title">@ViewBag.Title</h1>
+    </header>
+    <form class="form">
+        <div class="row">
+            @using (Html.BeginForm("Index", "Products", FormMethod.Get))
+            {
+                <div class="col-6 col-sm-3">
+                    @Html.TextBoxFor(model => model.ProductInformation.Productname, new { @id = "productnamefilter", @class = "form-control", @style = "width:100%", @autocomplete = "off", @PlaceHolder = "Search" })
+                </div>
+                <div class="col-6 col-sm-3">
+                    <button id="btnSearch" class="btn btn-primary" style="margin-bottom:10px">Search</button>
+                </div>
+            }
+        </div>
+
+        <div class="panel-body" id="resultlist">
+            @Html.Partial("Result", Model)
+        </div>
+
+        <hr class="uk-grid-divider" style="margin:15px 0">
+
+    </form>
+</section>
+
+<div id="createForm" class="modal-block mfp-hide">
+    @using (Html.BeginForm("ProductInsert", "Products", FormMethod.Post, new { @id = "createProductForm" }))
+    {
+        <section class="panel">
+            <header class="panel-heading">
+                <h2 class="panel-title">
+                    Add New Product
+                </h2>
+            </header>
+            <div class="panel-body modalBody">
+                <div id="create-product" class="form-horizontal mb-lg">
+                    @Html.Partial("Create", Model)
+                </div>
+
+                <div>
+                    <span id="CreateError"><strong class="text-danger"></strong></span>
+                </div>
+            </div>
+            <footer class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12 text-right">
+                        <button type="submit" id="btnCreateSubmit" name="btnCreateSubmit" value="CreateSubmit" class="btn btn-primary submitBtn">Save</button>
+                        <button id="btnCreateProductClose" name="btnCreateProductClose" value="CreateProductClose" class="modal-dismiss btn btn-primary submitBtn">Close</button>
+                    </div>
+                </div>
+            </footer>
+        </section>
+    }
+</div>
+
+<div id="editForm" class="modal-block mfp-hide">
+    @using (Html.BeginForm("ProductEdit", "Products", FormMethod.Post, new { @id = "editProductForm" }))
+    {
+        <section class="panel">
+            <header class="panel-heading">
+                <h2 class="panel-title">
+                    Edit Product
+                </h2>
+            </header>
+            <div class="panel-body modalBody">
+                <div id="edit-product" class="form-horizontal mb-lg">
+                    @Html.Partial("Edit", Model)
+                </div>
+
+                <div>
+                    <span id="EditError"><strong class="text-danger"></strong></span>
+                </div>
+            </div>
+            <footer class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12 text-right">
+                        <button type="submit" id="btnEditSubmit" name="btnEditSubmit" value="EditSubmit" class="btn btn-primary submitBtn">Save</button>
+                        <button id="btnEditProductClose" name="btnEditProductClose" value="EditProductClose" class="modal-dismiss btn btn-primary submitBtn">Close</button>
+                    </div>
+                </div>
+            </footer>
+        </section>
+    }
+</div>
+
+<div id="showForm" class="modal-block mfp-hide">
+    <section class="panel">
+        <header class="panel-heading">
+            <h2 class="panel-title">Show Product</h2>
+        </header>
+        <div class="panel-body modalBody">
+            <div id="show-product" class="form-horizontal mb-lg">
+                @Html.Partial("Show", Model)
+            </div>
+        </div>
+    </section>
+</div>
+
+@section styles{
+    <style>
+        .modalBody {
+            max-height: 400px;
+            overflow-y: scroll;
+        }
+
+        .panel-actions {
+            float: right;
+        }
+    </style>
+}
+
+@section scripts{
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+
+    <script>
+        function OpenCreateForm() {
+            $.magnificPopup.open({
+                items: {
+                    src: '#createForm'
+                },
+                type: 'inline'
+            });
+        }
+
+        function ShowProduct(Id) {
+            $.ajax({
+                url: '@Url.Action("GetProduct", "Products")/' + Id,
+                type: "GET",
+                success: function(data) {
+                    console.log(Id);
+                    $('#show-product').html(data);
+                    console.log(data);
+                    $.magnificPopup.open({
+                        items: {
+                            src: '#showForm'
+                        },
+                        type: 'inline'
+                    });
+                }
+            });
+        }
+
+        function EditProduct(Id) {
+            $.ajax({
+                url: '@Url.Action("EditProduct", "Products")/' + Id,
+                type: "GET",
+                success: function(data) {
+                    console.log(Id);
+                    $('#edit-product').html(data);
+                    console.log(data);
+                    $.magnificPopup.open({
+                        items: {
+                            src: '#editForm'
+                        },
+                        type: 'inline'
+                    });
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            var val = "";
+
+            $('.submitBtn').on('click',
+                function(e) {
+                    val = $(this).val();
+                });
+
+            $("#editProductform").validate({
+                rules: {
+                    "ProductInformation.Productname": {
+                        required: true
+                    },
+                    "ProductInformation.Price": {
+                        required: true
+                    },
+                    "ProductInformation.Details": {
+                        required: true
+                    }
+                },
+                messages: {
+                    "ProductInformation.Productname": {
+                        required: "This Field is Required"
+
+                    },
+                    "ProductInformation.Price": {
+                        required: "This Field is Required"
+                    },
+                    "ProductInformation.Details": {
+                        required: "This Field is Required"
+                    }
+                },
+                submitHandler: function(form) {
+
+                    if (val === "EditSubmit") {
+                        SubmitEditProduct();
+                    }
+                    return false;
+                }
+            });
+            $("#createProductForm").validate({
+                rules: {
+                    "ProductInformation.Productname": {
+                        required: true
+                    },
+                    "ProductInformation.Price": {
+                        required: true
+                    },
+                    "ProductInformation.Details": {
+                        required: true
+                    }
+                },
+                messages: {
+                    "ProductInformation.Productname": {
+                        required: "This Field is Required"
+
+                    },
+                    "ProductInformation.Price": {
+                        required: "This Field is Required"
+                    },
+                    "ProductInformation.Details": {
+                        required: "This Field is Required"
+                    }
+                },
+                submitHandler: function (form) {
+                    SubmitCreateProduct();
+                    return false;
+                }
+            });
+        });
+
+        function SubmitEditProduct()
+        {
+            var ProductInformation = {
+                Id: $("#editproductid").val(),
+                Productname: $("#editproductname").val(),
+                Price: $("#editprice").val(),
+                Details: $("#editdetails").val(),
+                Publish: $("#editpublish").val()
+            };
+
+            model = {
+                ProductInformation: ProductInformation
+            };
+
+            $("body").busyLoad("show", { text: "Saving...."
+            });
+
+            $.ajax({
+                type: "POST",
+                data: JSON.stringify(model),
+                dataType: "text",
+                url: '@Url.Action("ProductEdit", "Products")',
+                contentType: "application/json"
+            });
+        }
+
+        function SubmitCreateProduct() {
+
+                ProductInformation = {
+                    Productname: $("#createproductname").val(), Price: $("#createprice").val(), Details: $("#createdetails").val(), Publish: $("#createpublish").val(),
+                };
+
+                model = {
+                    ProductInformation: ProductInformation
+                };
+
+                $("body").busyLoad("show", { text: "Saving...."
+                });
+                $.ajax({
+                    type: "POST",
+                    data: JSON.stringify(model),
+                    dataType: "text",
+                    url: '@Url.Action("ProductInsert", "Products")',
+                    contentType: "application/json"
+                });
+        }
+
+        $('body').on('click', '#btnCreateProductClose', function () {
+            $("#CreateError").hide();
+
+            $('#createForm').magnificPopup('close');
+            window.location.reload();
+        });
+
+        $('body').on('click', '#btnEditProductClose', function () {
+            $("#EditError").hide();
+
+            $('#editForm').magnificPopup('close');
+            window.location.reload();
+        });
+
+        $('body').on('click', '#btnSearch', function (event) {
+
+            event.preventDefault();
+
+            var ProductViewModels = {
+                Productname: $("#productnamefilter").val()
+            }
+            $.ajax({
+                type: 'GET',
+                data: ProductViewModels,
+                url: '@Url.Action("Result", "Products")'
+            }).done(function (result) {
+                $('#resultlist').html(result);
+                console.log(result);
+            });
+        });
+    </script>
+}
+

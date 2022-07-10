@@ -1,0 +1,110 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <link rel="stylesheet" href="~/Scripts/magnific-popup/magnific-popup.css" />
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @RenderSection("styles", required: false)
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Karuna", "Index", "Products", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+
+
+    <script src="~/Scripts/magnific-popup/magnific-popup.js"></script>
+    <script>
+        var zoomModalConfig = {
+            type: 'inline',
+
+            fixedContentPos: false,
+            fixedBgPos: true,
+
+            overflowY: 'auto',
+
+            closeBtnInside: true,
+            preloader: false,
+
+            midClick: true,
+            removalDelay: 300,
+            mainClass: 'my-mfp-zoom-in',
+            modal: true
+        };
+        $(function () {
+
+            /*
+            Modal Dismiss
+            */
+            $(document).on('click', '.modal-dismiss', function (e) {
+                e.preventDefault();
+                $.magnificPopup.close();
+            });
+            $(document).on('click', '.nav-parent', function (e) {
+                $(this).toggleClass('nav-expanded');
+            });
+
+            /*
+            Modal with CSS animation
+            */
+            $('.modal-with-zoom-anim').magnificPopup(zoomModalConfig);
+
+            // confirm modal
+            $(document).on('click', '[data-confirm]', function (e) {
+                e.preventDefault();
+                var $this = $(this);
+                var $modal = $("#modalConfirm");
+                $("#confirm-msg").html($this.attr("data-confirm"));
+                $modal.find(".modal-confirm").off("click").on("click", function () {
+                    $.magnificPopup.close();
+                    $this.closest("form").trigger("submit");
+                });
+                $this.magnificPopup(zoomModalConfig);
+                $this.magnificPopup('open');
+            });
+
+            $(document).on("submit", "form", function () {
+                if (($("#ChangePassword_Password").val() == $("#ChangePassword_ConfirmPassword").val()) && ($("#ChangePassword_ConfirmPassword").val() !== "") && ($("#ChangePassword_CurrentPassword").val() !== "")) {
+                    $("#loader").show();
+                }
+            });
+            $(document).on("click", "a[href]:not([href^='#']):not([data-ajax])", function (e) {
+                if (!e.defaultPrevented)
+                    $("#loader").show();
+            });
+
+            $.ajaxSetup({
+                global: true,
+                beforeSend: function () {
+                    $("#loader").show();
+                },
+                complete: function () {
+                    $("#loader").hide();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
